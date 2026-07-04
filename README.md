@@ -1,13 +1,15 @@
 <style>
   :root {
-    --bg: #0d1117;
+    --bg: #242424;
     --text: #e6edf3;
     --link: #58a6ff;
+    --border: #444;
   }
   body.light-mode {
     --bg: #ffffff;
     --text: #1f2328;
     --link: #0969da;
+    --border: #d0d7de;
   }
   body {
     background-color: var(--bg);
@@ -16,6 +18,19 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   }
   a { color: var(--link); }
+  table {
+    background-color: transparent;
+    border-collapse: collapse;
+    margin: 0 auto;
+  }
+  th, td {
+    background-color: transparent !important;
+    color: var(--text);
+    text-align: center !important;
+    vertical-align: middle;
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+  }
   #theme-toggle-btn {
     position: fixed;
     top: 12px;
@@ -23,7 +38,7 @@
     z-index: 1000;
     padding: 8px 14px;
     border-radius: 999px;
-    border: 1px solid #444;
+    border: 1px solid var(--border);
     background: var(--bg);
     color: var(--text);
     cursor: pointer;
