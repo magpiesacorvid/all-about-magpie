@@ -135,3 +135,5 @@ I'm the worst player EVER!! Evidence BELOW...</p>
 </div>
 
 <!-- END_STATS -->
+
+<p align="center">Please, Check out my random animal generator site <a href="https://magpiesacorvid.github.io/AnimalImageGenerator/">here</a>!</p>
