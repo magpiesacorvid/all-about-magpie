@@ -112,10 +112,10 @@ I'm the worst player EVER!! Evidence BELOW...</p>
 
 <div align="center" markdown="1" style="display:flex; justify-content:center;">
 
-| Celeste | Silver | Paige | Ivy |
+<h4 align="center">| Celeste | Silver | Paige | Ivy |
 |:---:|:---:|:---:|:---:|
 | <img src="https://deadlock.wiki/images/7/70/Celeste_Gloat.png" width="60"> | <img src="https://deadlock.wiki/images/4/44/Silver_Gloat_Portrait.png" width="60"> | <img src="https://deadlock.wiki/images/0/02/Paige_Critical.png" width="60"> | <img src="https://deadlock.wiki/images/3/37/Ivy_Critical_.png" width="60"> |
-| 11W - 9L (55.0%) | 3W - 2L (60.0%) | 0W - 2L (0.0%) | 0W - 1L (0.0%) |
+| 11W - 9L (55.0%) | 3W - 2L (60.0%) | 0W - 2L (0.0%) | 0W - 1L (0.0%) |</h4>
 
 </div>
 
@@ -127,10 +127,10 @@ I'm the worst player EVER!! Evidence BELOW...</p>
 
 <div align="center" markdown="1" style="display:flex; justify-content:center;">
 
-| D.Va | Lucio | Freja | Symmetra |
+<h4 align="center">| D.Va | Lucio | Freja | Symmetra |
 |:---:|:---:|:---:|:---:|
 | <img src="https://cdn3.emoji.gg/emojis/5341-dvapeace.png" width="60"> | <img src="https://cdn3.emoji.gg/emojis/8866-luciocool.png" width="60"> | <img src="https://i.pinimg.com/736x/31/33/7a/31337adb5d3962e15a2c2ad9fe3856dc.jpg" width="60"> | <img src="https://cdn3.emoji.gg/emojis/8861-symmetragiggle.png" width="60"> |
-| 377W - 348L (52.0%) | 247W - 183L (57.4%) | 116W - 111L (51.1%) | 59W - 38L (60.8%) |
+| 377W - 348L (52.0%) | 247W - 183L (57.4%) | 116W - 111L (51.1%) | 59W - 38L (60.8%) |</h4>
 
 </div>
 
