@@ -44,6 +44,12 @@
     cursor: pointer;
     font-size: 14px;
   }
+  img.icon-blend {
+    mix-blend-mode: multiply;
+  }
+  body.light-mode img.icon-blend {
+    mix-blend-mode: normal;
+  }
 </style>
 
 <button id="theme-toggle-btn" onclick="toggleTheme()">Light Mode</button>
@@ -104,7 +110,7 @@ I'm the worst player EVER!! Evidence BELOW...</p>
 
 <h2 align="center">Game Stats</h2>
 
-<h3 align="center"><img src="https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/oldgods/rem_helper.png?2" height="22" valign="middle"> <span style="color:#eedfbf">Deadlock</span> <img src="https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/oldgods/rem_helper.png?2" height="22" valign="middle"></h3>
+<h3 align="center"><img class="icon-blend" src="https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/oldgods/rem_helper.png" height="22" valign="middle"> <span style="color:#eedfbf">Deadlock</span> <img class="icon-blend" src="https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/oldgods/rem_helper.png" height="22" valign="middle"></h3>
 
 <p align="center">Wins: 14<br>Losses: 14<br>Win Rate: 50.0%</p>
 
@@ -119,7 +125,7 @@ I'm the worst player EVER!! Evidence BELOW...</p>
 
 </div>
 
-<h3 align="center"><img src="https://cdn.betterttv.net/emote/698afc803df753bf3f83fcbd/3x.webp" height="22" valign="middle"> Ove<span style="color:#ef6414">rwa</span>tch <img src="https://cdn.betterttv.net/emote/698afc803df753bf3f83fcbd/3x.webp" height="22" valign="middle"></h3>
+<h3 align="center"><img class="icon-blend" src="https://cdn.betterttv.net/emote/698afc803df753bf3f83fcbd/3x.png" height="22" valign="middle"> Ove<span style="color:#ef6414">rwa</span>tch <img class="icon-blend" src="https://cdn.betterttv.net/emote/698afc803df753bf3f83fcbd/3x.png" height="22" valign="middle"></h3>
 
 <p align="center">Wins: 2963<br>Losses: 2838<br>Win Rate: 51.1%</p>
 
