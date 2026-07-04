@@ -1,6 +1,6 @@
 <style>
   :root {
-    --bg: #242424;
+    --bg: #000000;
     --text: #e6edf3;
     --link: #58a6ff;
     --border: #444;
@@ -110,7 +110,7 @@ I'm the worst player EVER!! Evidence BELOW...</p>
 
 <h4 align="center">Heroes</h4>
 
-<div align="center" markdown="1">
+<div align="center" markdown="1" style="display:flex; justify-content:center;">
 
 | Celeste | Silver | Paige | Ivy |
 |:---:|:---:|:---:|:---:|
@@ -125,7 +125,7 @@ I'm the worst player EVER!! Evidence BELOW...</p>
 
 <h4 align="center">Heroes</h4>
 
-<div align="center" markdown="1">
+<div align="center" markdown="1" style="display:flex; justify-content:center;">
 
 | D.Va | Lucio | Freja | Symmetra |
 |:---:|:---:|:---:|:---:|
