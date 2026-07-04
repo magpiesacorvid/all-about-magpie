@@ -110,7 +110,7 @@ def game_section(name, g):
 
     heroes_html = (
         '<h4 align="center">Heroes</h4>\n\n'
-        '<div align="center" markdown="1">\n\n'
+        '<div align="center" markdown="1" style="display:flex; justify-content:center;">\n\n'
         f"{table}\n\n"
         '</div>'
     )
