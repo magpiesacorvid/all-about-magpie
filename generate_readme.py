@@ -79,9 +79,9 @@ def game_section(name, g):
     heading = GAME_HEADINGS[name]
 
     heading_html = (
-        f'<h3 align="center"><img class="icon-blend" src="{icon}" height="22" valign="middle"> '
+        f'<h3 align="center"><img src="{icon}" height="22" valign="middle"> '
         f'{heading} '
-        f'<img class="icon-blend" src="{icon}" height="22" valign="middle"></h3>'
+        f'<img src="{icon}" height="22" valign="middle"></h3>'
     )
     stats_html = (
         f'<p align="center">Wins: {g["wins"]}<br>'
@@ -136,5 +136,4 @@ new_readme = re.sub(
     flags=re.DOTALL,
 )
 
-readme_path.write_text(new_readme)
 readme_path.write_text(new_readme)
