@@ -6,8 +6,8 @@ data = json.loads(Path("stats.json").read_text())
 
 # Icons shown either side of each game's heading
 GAME_ICONS = {
-    "Deadlock": "https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/oldgods/rem_helper.png?2",
-    "Overwatch": "https://cdn.betterttv.net/emote/698afc803df753bf3f83fcbd/3x.webp",
+    "Deadlock": "https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/oldgods/rem_helper.png",
+    "Overwatch": "https://cdn.betterttv.net/emote/698afc803df753bf3f83fcbd/3x.png",
 }
 
 # Colored/styled heading text for each game
@@ -47,7 +47,7 @@ HERO_IMAGES = {
     },
     "Lucio": {
         "gloat": "https://cdn3.emoji.gg/emojis/8866-luciocool.png",
-        "critical": "https://cdn.betterttv.net/emote/5bc3e33f555f4b166afde06d/3x.webp",
+        "critical": "https://cdn.betterttv.net/emote/5bc3e33f555f4b166afde06d/3x.png",
     },
     "Freja": {
         "gloat": "https://i.pinimg.com/736x/31/33/7a/31337adb5d3962e15a2c2ad9fe3856dc.jpg",
