@@ -179,7 +179,9 @@ def recover(name: str):
     original = urljoin(BASE.replace("https://", "http://"), name)
     exact_wayback = f"https://web.archive.org/web/{STAMP}id_/{original}"
     jina_live = "https://r.jina.ai/" + original
+    jina_wayback = f"https://r.jina.ai/http://web.archive.org/web/{STAMP}/{original}"
     primary_attempts = [
+        ("jina-wayback-mirror", jina_wayback),
         ("jina-live-mirror", jina_live),
         ("wayback-exact", exact_wayback),
         ("live", live),
@@ -189,7 +191,7 @@ def recover(name: str):
         try:
             body, final_url = fetch(url, 8 if kind == "wayback-exact" else (2 if kind == "live" else 1))
             text = decode_text(body)
-            if kind == "jina-live-mirror" and "Markdown Content:\n" in text:
+            if kind.startswith("jina-") and "Markdown Content:\n" in text:
                 text = text.split("Markdown Content:\n", 1)[1]
             if is_genuine(text, suffix):
                 return {
