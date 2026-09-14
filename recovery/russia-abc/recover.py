@@ -179,8 +179,6 @@ def recover(name: str):
     ]
     for kind, url in primary_attempts:
         try:
-            if kind == "wayback-exact":
-                time.sleep(6.5)
             body, final_url = fetch(url, 8 if kind == "wayback-exact" else (2 if kind == "live" else 1))
             text = decode_text(body)
             if is_genuine(text, suffix):
@@ -595,7 +593,14 @@ def fetch_batch():
     count = int(os.environ["BATCH_COUNT"])
     assigned = TARGETS[index::count]
     results = []
-    for name in assigned:
+    # Coordinate the matrix jobs into a single global request cadence.  Each
+    # worker starts in its numbered time slot and then waits a complete matrix
+    # cycle before its next capture, keeping archive traffic below the throttle.
+    slot_seconds = 7.0
+    time.sleep(index * slot_seconds)
+    for position, name in enumerate(assigned):
+        if position:
+            time.sleep(count * slot_seconds)
         result = recover(name)
         results.append(result)
         print(result["status"], result["target"], result["kind"], flush=True)
