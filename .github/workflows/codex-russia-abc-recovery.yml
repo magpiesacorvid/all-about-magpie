@@ -1,0 +1,28 @@
+name: Codex Russia ABC recovery
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recover and clean the Russia ABC collection
+        run: python recovery/russia-abc/recover.py
+      - name: Upload completed collection
+        uses: actions/upload-artifact@v4
+        with:
+          name: Russia_ABCs_complete_cleaned
+          path: recovery/russia-abc/output/Russia_ABCs_complete_cleaned.zip
+          if-no-files-found: error
+          retention-days: 7
