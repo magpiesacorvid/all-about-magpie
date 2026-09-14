@@ -13,6 +13,7 @@ import unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import urlencode, urljoin
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from zipfile import ZIP_DEFLATED, ZipFile
 
@@ -100,7 +101,15 @@ def fetch(url: str, tries: int = 6):
                 return body, response.geturl()
         except Exception as exc:
             errors.append(str(exc))
-            time.sleep(min(12, 1.6**attempt) + random.random())
+            if isinstance(exc, HTTPError) and exc.code in {429, 502, 503, 504}:
+                retry_after = exc.headers.get("Retry-After")
+                try:
+                    wait = float(retry_after) if retry_after else 8 + attempt * 6
+                except ValueError:
+                    wait = 8 + attempt * 6
+                time.sleep(min(45, wait) + random.random())
+            else:
+                time.sleep(min(12, 1.6**attempt) + random.random())
     raise RuntimeError(" | ".join(errors)[-2500:])
 
 
@@ -168,9 +177,11 @@ def recover(name: str):
     ]
     for kind, url in primary_attempts:
         try:
-            body, final_url = fetch(url, 1)
+            body, final_url = fetch(url, 8 if kind == "wayback-exact" else (2 if kind == "live" else 1))
             text = decode_text(body)
             if is_genuine(text, suffix):
+                if kind == "wayback-exact":
+                    time.sleep(1.2)
                 return {
                     "target": name,
                     "status": "recovered",
@@ -331,7 +342,7 @@ def main():
         path.mkdir(parents=True, exist_ok=True)
 
     results = []
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=1) as pool:
         futures = {pool.submit(recover, name): name for name in TARGETS}
         for future in as_completed(futures):
             result = future.result()
