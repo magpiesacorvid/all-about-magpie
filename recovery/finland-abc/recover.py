@@ -253,11 +253,8 @@ def archive_urls(original):
 
 def recover(item):
  live=urljoin(BASE,item["href"])
- trials=[("live",live),("live-http",live.replace("https://","http://",1))]
- original=urljoin(BASE.replace("https://","http://"),item["href"])
- trials += [("wayback",u) for u in archive_urls(original)]
  errors=[]
- for kind,url in trials:
+ for kind,url in [("live",live),("live-http",live.replace("https://","http://",1))]:
   try:
    b,final=fetch(url,4 if kind=="live" else 2); s=textof(b)
    if abc_ok(s):
@@ -265,6 +262,15 @@ def recover(item):
     return item
    errors.append(kind+":not ABC")
   except Exception as e: errors.append(kind+":"+str(e))
+ original=urljoin(BASE.replace("https://","http://"),item["href"])
+ for url in archive_urls(original):
+  try:
+   b,final=fetch(url,2); s=textof(b)
+   if abc_ok(s):
+    item.update(status="recovered",kind="wayback",url=final,text=s.rstrip()+"\n",size=len(b),error="")
+    return item
+   errors.append("wayback:not ABC")
+  except Exception as e: errors.append("wayback:"+str(e))
  item.update(status="unresolved",kind="",url=live,text="",size=0,error=" || ".join(errors)[-3500:])
  return item
 
