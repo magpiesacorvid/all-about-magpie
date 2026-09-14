@@ -93,7 +93,7 @@ def fetch(url: str, tries: int = 6):
                     "Accept": "text/plain,text/vnd.abc,*/*",
                 },
             )
-            with urlopen(req, timeout=20) as response:
+            with urlopen(req, timeout=15) as response:
                 body = response.read()
                 if not body:
                     raise ValueError("empty response")
@@ -159,11 +159,16 @@ def recover(name: str):
     suffix = Path(name).suffix.lower()
     live = urljoin(BASE, name)
     errors = []
-    live_attempts = [("live", live), ("live-http", live.replace("https://", "http://", 1))]
     original = urljoin(BASE.replace("https://", "http://"), name)
-    for kind, url in live_attempts:
+    exact_wayback = f"https://web.archive.org/web/{STAMP}id_/{original}"
+    primary_attempts = [
+        ("wayback-exact", exact_wayback),
+        ("live", live),
+        ("live-http", live.replace("https://", "http://", 1)),
+    ]
+    for kind, url in primary_attempts:
         try:
-            body, final_url = fetch(url, 2 if kind == "live" else 1)
+            body, final_url = fetch(url, 1)
             text = decode_text(body)
             if is_genuine(text, suffix):
                 return {
@@ -179,6 +184,8 @@ def recover(name: str):
         except Exception as exc:
             errors.append(f"{kind}: {exc}")
     for url in archive_urls(original):
+        if url == exact_wayback:
+            continue
         kind = "wayback"
         try:
             body, final_url = fetch(url, 1)
