@@ -93,7 +93,7 @@ def fetch(url: str, tries: int = 6):
                     "Accept": "text/plain,text/vnd.abc,*/*",
                 },
             )
-            with urlopen(req, timeout=45) as response:
+            with urlopen(req, timeout=20) as response:
                 body = response.read()
                 if not body:
                     raise ValueError("empty response")
@@ -146,7 +146,7 @@ def archive_urls(original_http: str):
         }
     )
     try:
-        raw, _ = fetch(cdx, 3)
+        raw, _ = fetch(cdx, 2)
         rows = json.loads(raw.decode("utf-8"))
         for row in reversed(rows[1:]):
             urls.append(f"https://web.archive.org/web/{row[0]}id_/{row[1]}")
@@ -163,7 +163,7 @@ def recover(name: str):
     original = urljoin(BASE.replace("https://", "http://"), name)
     for kind, url in live_attempts:
         try:
-            body, final_url = fetch(url, 4 if kind == "live" else 2)
+            body, final_url = fetch(url, 2 if kind == "live" else 1)
             text = decode_text(body)
             if is_genuine(text, suffix):
                 return {
@@ -181,7 +181,7 @@ def recover(name: str):
     for url in archive_urls(original):
         kind = "wayback"
         try:
-            body, final_url = fetch(url, 2)
+            body, final_url = fetch(url, 1)
             text = decode_text(body)
             if is_genuine(text, suffix):
                 return {
@@ -324,7 +324,7 @@ def main():
         path.mkdir(parents=True, exist_ok=True)
 
     results = []
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=8) as pool:
         futures = {pool.submit(recover, name): name for name in TARGETS}
         for future in as_completed(futures):
             result = future.result()
