@@ -5,9 +5,11 @@ import csv
 import hashlib
 import html
 import json
+import os
 import random
 import re
 import shutil
+import sys
 import time
 import unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -331,7 +333,7 @@ def write_csv(path: Path, rows, fieldnames):
         writer.writerows(rows)
 
 
-def main():
+def build(results):
     shutil.rmtree(WORK, ignore_errors=True)
     shutil.rmtree(OUT, ignore_errors=True)
     source_dir = WORK / "source_files"
@@ -341,13 +343,6 @@ def main():
     for path in (source_dir, support_dir, individual_dir, report_dir, OUT):
         path.mkdir(parents=True, exist_ok=True)
 
-    results = []
-    with ThreadPoolExecutor(max_workers=1) as pool:
-        futures = {pool.submit(recover, name): name for name in TARGETS}
-        for future in as_completed(futures):
-            result = future.result()
-            results.append(result)
-            print(result["status"], result["target"], result["kind"], flush=True)
     results.sort(key=lambda result: TARGETS.index(result["target"]))
 
     recovered_by_name = {}
@@ -592,8 +587,82 @@ reports/ - recovery, parsing, title, duplicate and unresolved audits
             raise RuntimeError("individual collection absent")
 
     print(report, flush=True)
+    return recovered
+
+
+def fetch_batch():
+    index = int(os.environ["BATCH_INDEX"])
+    count = int(os.environ["BATCH_COUNT"])
+    assigned = TARGETS[index::count]
+    results = []
+    for name in assigned:
+        result = recover(name)
+        results.append(result)
+        print(result["status"], result["target"], result["kind"], flush=True)
+    destination = ROOT / "batch_output"
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / f"results_{index}.json").write_text(
+        json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    recovered = sum(item["status"] == "recovered" for item in results)
+    print(f"batch {index}: recovered {recovered}/{len(assigned)}", flush=True)
+
+
+def finalize_batches():
+    incoming = ROOT / "incoming"
+    files = sorted(incoming.rglob("results_*.json"))
+    if not files:
+        raise RuntimeError("no batch result files found")
+    by_target = {}
+    for path in files:
+        for result in json.loads(path.read_text(encoding="utf-8")):
+            existing = by_target.get(result["target"])
+            if existing is None or (
+                existing["status"] != "recovered" and result["status"] == "recovered"
+            ):
+                by_target[result["target"]] = result
+    results = []
+    for name in TARGETS:
+        results.append(
+            by_target.get(
+                name,
+                {
+                    "target": name,
+                    "status": "unresolved",
+                    "kind": "",
+                    "url": urljoin(BASE, name),
+                    "text": "",
+                    "bytes": 0,
+                    "error": "batch result missing",
+                },
+            )
+        )
+    recovered = build(results)
     if recovered < 45:
         raise RuntimeError(f"catastrophic recovery: only {recovered}/{len(TARGETS)} files")
+
+
+def main():
+    mode = sys.argv[1] if len(sys.argv) > 1 else "all"
+    if mode == "fetch-batch":
+        fetch_batch()
+    elif mode == "finalize":
+        finalize_batches()
+    elif mode == "all":
+        results = []
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            futures = {pool.submit(recover, name): name for name in TARGETS}
+            for future in as_completed(futures):
+                result = future.result()
+                results.append(result)
+                print(result["status"], result["target"], result["kind"], flush=True)
+        recovered = build(results)
+        if recovered < 45:
+            raise RuntimeError(
+                f"catastrophic recovery: only {recovered}/{len(TARGETS)} files"
+            )
+    else:
+        raise SystemExit(f"unknown mode: {mode}")
 
 
 if __name__ == "__main__":
