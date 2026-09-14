@@ -177,11 +177,11 @@ def recover(name: str):
     ]
     for kind, url in primary_attempts:
         try:
+            if kind == "wayback-exact":
+                time.sleep(6.5)
             body, final_url = fetch(url, 8 if kind == "wayback-exact" else (2 if kind == "live" else 1))
             text = decode_text(body)
             if is_genuine(text, suffix):
-                if kind == "wayback-exact":
-                    time.sleep(1.2)
                 return {
                     "target": name,
                     "status": "recovered",
