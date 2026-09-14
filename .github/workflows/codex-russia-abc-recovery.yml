@@ -1,0 +1,61 @@
+name: Codex Russia ABC recovery
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  recover-batches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        batch: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Recover source batch
+        env:
+          BATCH_INDEX: ${{ matrix.batch }}
+          BATCH_COUNT: 8
+        run: python recovery/russia-abc/recover.py fetch-batch
+      - name: Upload source batch
+        uses: actions/upload-artifact@v4
+        with:
+          name: Russia_ABC_batch_${{ matrix.batch }}
+          path: recovery/russia-abc/batch_output/results_${{ matrix.batch }}.json
+          if-no-files-found: error
+          retention-days: 1
+
+  finalize:
+    needs: recover-batches
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download recovered source batches
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Russia_ABC_batch_*
+          path: recovery/russia-abc/incoming
+          merge-multiple: true
+      - name: Merge, title, split and deduplicate
+        run: python recovery/russia-abc/recover.py finalize
+      - name: Upload completed collection
+        uses: actions/upload-artifact@v4
+        with:
+          name: Russia_ABCs_complete_cleaned
+          path: recovery/russia-abc/output/Russia_ABCs_complete_cleaned.zip
+          if-no-files-found: error
+          retention-days: 7
