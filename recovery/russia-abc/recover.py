@@ -133,7 +133,13 @@ def is_genuine(text: str, suffix: str) -> bool:
     if not text.strip() or is_error_page(text):
         return False
     if suffix in {".fmt", ".hdr"}:
-        return True
+        return not bool(
+            re.search(
+                r"(?:bad gateway|upstream.*error|internal server error|page not found|status code\s*[:=]\s*[45]\d\d)",
+                text,
+                re.I,
+            )
+        )
     # Accept complete tunes and genuine ABC fragments whose headers live in a
     # companion .hdr. Reject index/error pages and arbitrary tiny responses.
     has_field = bool(re.search(r"(?m)^\s*(?:X|T|M|L|K|Q|R|C)\s*:", text))
@@ -172,7 +178,9 @@ def recover(name: str):
     errors = []
     original = urljoin(BASE.replace("https://", "http://"), name)
     exact_wayback = f"https://web.archive.org/web/{STAMP}id_/{original}"
+    jina_live = "https://r.jina.ai/" + original
     primary_attempts = [
+        ("jina-live-mirror", jina_live),
         ("wayback-exact", exact_wayback),
         ("live", live),
         ("live-http", live.replace("https://", "http://", 1)),
@@ -181,6 +189,8 @@ def recover(name: str):
         try:
             body, final_url = fetch(url, 8 if kind == "wayback-exact" else (2 if kind == "live" else 1))
             text = decode_text(body)
+            if kind == "jina-live-mirror" and "Markdown Content:\n" in text:
+                text = text.split("Markdown Content:\n", 1)[1]
             if is_genuine(text, suffix):
                 return {
                     "target": name,
