@@ -126,7 +126,10 @@ def is_genuine(text: str, suffix: str) -> bool:
     # Accept complete tunes and genuine ABC fragments whose headers live in a
     # companion .hdr. Reject index/error pages and arbitrary tiny responses.
     has_field = bool(re.search(r"(?m)^\s*(?:X|T|M|L|K|Q|R|C)\s*:", text))
-    has_music = bool(re.search(r"(?m)(?:\|[:|]?|[\^_=]?[A-Ga-gz][,']*[0-9/]*)", text))
+    has_music = bool(
+        re.search(r"(?m)^[^%\n]*[A-Ga-gz][^\n]*\|[^\n]*$", text)
+        or re.search(r"(?m)^\s*[\^_=]?[A-Ga-gz][,']*[0-9/]*(?:\s|$)", text)
+    )
     return has_field or (has_music and len(text.strip()) >= 20)
 
 
@@ -156,12 +159,29 @@ def recover(name: str):
     suffix = Path(name).suffix.lower()
     live = urljoin(BASE, name)
     errors = []
-    attempts = [("live", live), ("live-http", live.replace("https://", "http://", 1))]
+    live_attempts = [("live", live), ("live-http", live.replace("https://", "http://", 1))]
     original = urljoin(BASE.replace("https://", "http://"), name)
-    attempts.extend(("wayback", url) for url in archive_urls(original))
-    for kind, url in attempts:
+    for kind, url in live_attempts:
         try:
             body, final_url = fetch(url, 4 if kind == "live" else 2)
+            text = decode_text(body)
+            if is_genuine(text, suffix):
+                return {
+                    "target": name,
+                    "status": "recovered",
+                    "kind": kind,
+                    "url": final_url,
+                    "text": text.rstrip() + "\n",
+                    "bytes": len(body),
+                    "error": "",
+                }
+            errors.append(f"{kind}: response was not a genuine source body")
+        except Exception as exc:
+            errors.append(f"{kind}: {exc}")
+    for url in archive_urls(original):
+        kind = "wayback"
+        try:
+            body, final_url = fetch(url, 2)
             text = decode_text(body)
             if is_genuine(text, suffix):
                 return {
